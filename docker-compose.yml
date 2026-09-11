@@ -30,6 +30,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      default:
+        aliases:
+          - backend.railway.internal
 
   frontend:
     build: ./front-end/traffic-analytics-web
