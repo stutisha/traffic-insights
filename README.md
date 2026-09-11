@@ -90,3 +90,12 @@ Run backend tests from the API folder:
 cd back-end/traffic-analytics-api
 npm test -- --runInBand
 ```
+
+At 5 RPS, a single application instance should be enough.
+
+At 50 RPS, I would add multiple instances behind a load balancer, along with caching and database connection pooling.
+
+At 500 RPS, I would use auto-scaling, Redis caching, background queues for heavy tasks, and scale the database if needed.
+
+The key is to scale based on the actual bottleneck instead of over-engineering from the start.
+
