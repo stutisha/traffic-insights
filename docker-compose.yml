@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: traffic_analytics
+      POSTGRES_USER: ${DB_USER:-stutisharma}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-stutisharma} -d traffic_analytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./back-end/traffic-analytics-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: traffic_analytics
+      DB_USER: ${DB_USER:-stutisharma}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./front-end/traffic-analytics-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
